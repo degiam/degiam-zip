@@ -7,7 +7,7 @@ const Dropzone = () => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<{ file: File; path: string }[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [zipName, setZipName] = useState('files.zip');
+  const [zipName, setZipName] = useState('');
   const [errorFile, setErrorFile] = useState<string | null>(null);
   const [errorName, setErrorName] = useState<string | null>(null);
 
@@ -80,7 +80,12 @@ const Dropzone = () => {
 
     const invalidChars = /[<>:"/\\|?*]/;
     if (invalidChars.test(zipName)) {
-      setErrorName('Nama file tidak valid. Hindari karakter seperti < > : " / \\ | ? *.');
+      setErrorName('Nama file tidak valid. Hindari karakter seperti < > : " / \\ | ? *');
+      return;
+    }
+
+    if (!zipName.trim()) {
+      setErrorName('Nama file harus diisi');
       return;
     }
 
@@ -141,7 +146,7 @@ const Dropzone = () => {
 
       <div className='w-full max-w-lg'>
         <div
-          className='w-full p-6 transition rounded-2xl border-2 border-dashed hover:border-cyan-500 dark:border-slate-700 hover:cursor-pointer'
+          className='w-full p-6 transition rounded-2xl border-2 border-dashed hover:border-cyan-400 dark:border-slate-700 dark:hover:border-cyan-500 hover:cursor-pointer'
           {...getRootProps()}
         >
           <input {...getInputProps()} />
