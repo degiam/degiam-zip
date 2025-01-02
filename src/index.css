@@ -4,6 +4,9 @@
 
 @layer base {
   body {
-    @apply cursor-default;
+    @apply cursor-default dark:bg-slate-900 dark:text-white;
+  }
+  input, select, textarea {
+    @apply bg-white text-black;
   }
 }

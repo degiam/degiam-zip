@@ -1,31 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 const Dropzone = () => {
   const [isDragActive, setIsDragActive] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: number; path: string }[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<{ file: File; path: string }[]>([]);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [zipName, setZipName] = useState('files.zip');
+  const [errorFile, setErrorFile] = useState<string | null>(null);
+  const [errorName, setErrorName] = useState<string | null>(null);
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: (acceptedFiles) => {
-      const filesWithPaths = acceptedFiles.map((file) => ({
-        name: file.name,
-        size: file.size,
-        path: file.webkitRelativePath || file.name,
-      }));
-      setUploadedFiles((prevFiles) => [...prevFiles, ...filesWithPaths]);
-      setIsDragActive(false);
-    },
-    onDragEnter: () => {
-      setIsDragActive(true);
-    },
-    onDragLeave: () => {
-      setIsDragActive(false);
-    },
-  });
-
-  const handleRemoveFile = (fileName: string) => {
-    setUploadedFiles((prevFiles) => prevFiles.filter(file => file.name !== fileName));
-  };
+  const filenameRef = useRef<HTMLInputElement>(null);
 
   const formatFileSize = (size: number) => {
     const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
@@ -44,9 +30,94 @@ const Dropzone = () => {
     return `${formattedSize.toFixed(2)} ${units[unitIndex]}`;
   };
 
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      const filesWithPaths = acceptedFiles.map((file) => ({
+        file,
+        path: file.webkitRelativePath || file.name,
+      }));
+      setUploadedFiles((prevFiles) => [...prevFiles, ...filesWithPaths]);
+      setIsDragActive(false);
+    },
+    onDragEnter: () => {
+      setIsDragActive(true);
+    },
+    onDragLeave: () => {
+      setIsDragActive(false);
+    },
+  });
+
+  const handleRemoveFile = (targetFile: File) => {
+    setUploadedFiles((prevFiles) => prevFiles.filter(({ file }) => file !== targetFile));
+  };
+
+  const determineZipName = () => {
+    const folderPaths = new Set(uploadedFiles.map(({ path }) => path.split('/')[0]));
+
+    if (uploadedFiles.length === 1) {
+      const singleFile = uploadedFiles[0].path;
+      const fileNameWithoutExt = singleFile.split('/').pop()?.split('.').slice(0, -1).join('.');
+      return fileNameWithoutExt || 'file';
+    }
+
+    if (folderPaths.size === 1) {
+      return Array.from(folderPaths)[0];
+    } else if (folderPaths.size > 1) {
+      return 'multiple-folders';
+    }
+
+    const hasFilesWithoutFolders = uploadedFiles.some(({ path }) => !path.includes('/'));
+    if (hasFilesWithoutFolders) {
+      return 'mixed-files';
+    }
+
+    return 'files';
+  };
+
+  const handleDownloadZip = async () => {
+    setErrorFile(null);
+    setErrorName(null);
+
+    const invalidChars = /[<>:"/\\|?*]/;
+    if (invalidChars.test(zipName)) {
+      setErrorName('Nama file tidak valid. Hindari karakter seperti < > : " / \\ | ? *.');
+      return;
+    }
+
+    try {
+      const zip = new JSZip();
+
+      uploadedFiles.forEach(({ file, path }) => {
+        zip.file(path, file);
+      });
+
+      const blob = await zip.generateAsync({ type: 'blob' });
+      saveAs(blob, `${zipName || 'archive'}.zip`);
+    } catch (error) {
+      setErrorFile('Terjadi kesalahan saat membuat ZIP. Silakan periksa lagi file atau folder yang dipilih.');
+      console.error(error);
+    }
+
+    setIsPopupVisible(false);
+  };
+
+  const openPopup = () => {
+    const suggestedName = determineZipName();
+    setZipName(suggestedName);
+    setIsPopupVisible(true);
+  };
+
+  const closePopup = () => {
+    setIsPopupVisible(false);
+    setErrorName(null);
+  };
+
   useEffect(() => {
-    console.log('Files dropped:', uploadedFiles);
-  },[uploadedFiles]);
+    if (isPopupVisible && filenameRef.current) {
+      filenameRef.current.focus();
+      filenameRef.current.setSelectionRange(0, filenameRef.current.value.length);
+    }
+  }, [isPopupVisible]);
 
   return (
     <div
@@ -70,29 +141,29 @@ const Dropzone = () => {
 
       <div className='w-full max-w-lg'>
         <div
-          className='w-full p-6 transition rounded-2xl border-2 border-dashed hover:border-cyan-500 hover:cursor-pointer'
+          className='w-full p-6 transition rounded-2xl border-2 border-dashed hover:border-cyan-500 dark:border-slate-700 hover:cursor-pointer'
           {...getRootProps()}
         >
           <input {...getInputProps()} />
-          <div className='text-center'>
-            <h2 className='text-xl font-semibold text-slate-800'>Tarik dan Taruh File Disini</h2>
-            <p className='text-sm text-slate-400 mt-2'>atau klik untuk telusuri</p>
+          <div className='text-center py-4'>
+            <h2 className='text-xl font-semibold text-slate-800 dark:text-white'>Tarik dan Taruh File Disini</h2>
+            <p className='text-sm text-slate-400 dark:text-slate-600 mt-2'>atau klik untuk telusuri</p>
           </div>
         </div>
 
         {uploadedFiles.length > 0 && (
           <div className='w-full mt-8'>
             <ul>
-              {uploadedFiles.map((file, index) => (
-                <li key={index} className='flex justify-between items-center gap-6 py-2 border-b border-slate-200 last:border-0'>
-                  <span className='text-sm text-slate-700'>{file.path}</span>
+              {uploadedFiles.map(({ file, path }, index) => (
+                <li key={index} className='flex justify-between items-center gap-6 py-3 border-b border-slate-200 dark:border-slate-700 last:border-0'>
+                  <span className='text-sm text-slate-700 dark:text-white'>{path}</span>
                   <div className='flex items-center'>
-                    <span className='text-sm text-slate-400 whitespace-nowrap'>{formatFileSize(file.size)}</span>
+                    <span className='text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap'>{formatFileSize(file.size)}</span>
                     <button
-                      onClick={() => handleRemoveFile(file.name)}
+                      onClick={() => handleRemoveFile(file)}
                       className='ml-3 text-sm text-red-500 hover:text-red-700'
                     >
-                      <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+                      <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
                         <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                         <path d='M4 7l16 0' />
                         <path d='M10 11l0 6' />
@@ -106,6 +177,52 @@ const Dropzone = () => {
                 </li>
               ))}
             </ul>
+            <button
+              onClick={openPopup}
+              className='mt-4 w-full px-4 py-3 rounded-lg transition font-bold text-white bg-cyan-500 hover:bg-cyan-600'
+            >
+              Download ZIP
+            </button>
+          </div>
+        )}
+
+        {isPopupVisible && (
+          <div className='fixed inset-0 flex justify-center items-center bg-black/80 z-50'>
+            <div className='flex flex-col gap-4 bg-white dark:bg-slate-900 p-8 rounded-xl shadow-xl w-full max-w-md'>
+              <h3 className='text-lg font-bold'>Masukkan Nama File ZIP</h3>
+              <fieldset className='flex flex-col gap-2 mb-2'>
+                <input
+                  ref={filenameRef}
+                  type='text'
+                  value={zipName}
+                  onChange={(e) => setZipName(e.target.value)}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg ${errorName ? 'border-red-500' : ''}`}
+                />
+                {errorName && 
+                  <p className='text-xs text-red-500'>{errorName}</p>
+                }
+              </fieldset>
+              <button
+                type='button'
+                onClick={handleDownloadZip}
+                className='w-full px-4 py-3 rounded-lg transition font-bold text-white bg-cyan-500 hover:bg-cyan-600'
+              >
+                Unduh ZIP
+              </button>
+              <button
+                type='button'
+                onClick={closePopup}
+                className='w-full px-4 py-3 rounded-lg transition text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-800/50'
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
+
+        {errorFile && (
+          <div className='mt-4 p-4 bg-red-100 text-red-700 rounded-lg'>
+            <p>{errorFile}</p>
           </div>
         )}
       </div>
