@@ -75,6 +75,7 @@ function App() {
 
   return (
     <main className={isStandalone ? isMobile ? '[&_.main-layout]:max-md:pb-24' : '[&_.main-layout]:md:pt-24' : ''}>
+      <h1 className='sr-only'>QuiZip by Degiam</h1>
       <Dropzone />
     </main>
   )
