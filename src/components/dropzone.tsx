@@ -184,7 +184,7 @@ const Dropzone = () => {
             </ul>
             <button
               onClick={openPopup}
-              className='mt-4 w-full px-4 py-3 rounded-lg transition font-bold text-white bg-cyan-500 hover:bg-cyan-600'
+              className='mt-8 w-full px-4 py-3 rounded-lg transition font-bold text-white bg-cyan-500 hover:bg-cyan-600'
             >
               Download ZIP
             </button>
@@ -201,7 +201,7 @@ const Dropzone = () => {
                   type='text'
                   value={zipName}
                   onChange={(e) => setZipName(e.target.value)}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg ${errorName ? 'border-red-500' : ''}`}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:shadow-[2px_2px_0_#22d3ee,-2px_2px_0_#22d3ee,2px_-2px_0_#22d3ee,-2px_-2px_0_#22d3ee] focus-visible:outline-none focus:border-slate-400 ${errorName ? 'border-red-500' : ''}`}
                 />
                 {errorName && 
                   <p className='text-xs text-red-500'>{errorName}</p>
@@ -217,7 +217,7 @@ const Dropzone = () => {
               <button
                 type='button'
                 onClick={closePopup}
-                className='w-full px-4 py-3 rounded-lg transition text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-800/50'
+                className='w-full px-4 py-3 rounded-lg transition text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-200 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800'
               >
                 Batal
               </button>
