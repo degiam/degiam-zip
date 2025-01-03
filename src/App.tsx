@@ -1,7 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Dropzone from './components/dropzone';
 
 function App() {
+  useEffect(() => {
+    const sendHeightToParent = () => {
+      const height = document.body.scrollHeight;
+      window.parent.postMessage({ type: 'resize', height }, '*');
+    };
+
+    sendHeightToParent();
+
+    const observer = new MutationObserver(sendHeightToParent);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     window.addEventListener('message', (event) => {
       if (event.data?.type === 'theme-change') {
@@ -35,8 +51,30 @@ function App() {
     };
   }, []);
 
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'screen-size') {
+        setIsStandalone(true);
+        if (event.data.isMobile) {
+          setIsMobile(true);
+        } else {
+          setIsMobile(false);
+        }
+      }
+    };
+  
+    window.addEventListener('message', handleMessage);
+  
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
   return (
-    <main>
+    <main className={isStandalone ? isMobile ? '[&_.main-layout]:max-md:pb-24' : '[&_.main-layout]:md:pt-24' : ''}>
       <Dropzone />
     </main>
   )

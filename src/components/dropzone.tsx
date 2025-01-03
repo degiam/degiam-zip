@@ -126,7 +126,7 @@ const Dropzone = () => {
 
   return (
     <div
-      className='flex justify-center items-center min-h-screen p-6'
+      className='flex justify-center items-center min-h-screen p-6 main-layout'
       {...getRootProps()}
       onClick={(e) => e.stopPropagation()}
     >
