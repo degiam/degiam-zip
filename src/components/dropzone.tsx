@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import Brand from './brand';
 
 const Dropzone = () => {
   const [isDragActive, setIsDragActive] = useState(false);
@@ -144,7 +145,11 @@ const Dropzone = () => {
         </div>
       </div>
 
-      <div className='w-full max-w-lg'>
+      <div className='w-full max-w-lg mb-14'>
+        <div className='w-fit mx-auto mb-4'>
+          <Brand />
+        </div>
+
         <div
           className='w-full p-6 transition rounded-2xl border-2 border-dashed hover:border-cyan-400 dark:border-slate-700 dark:hover:border-cyan-500 hover:cursor-pointer'
           {...getRootProps()}
