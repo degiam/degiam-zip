@@ -145,7 +145,7 @@ const Dropzone = () => {
         </div>
       </div>
 
-      <div className='w-full max-w-lg mb-14'>
+      <div className='w-full max-w-lg mb-32'>
         <div className='w-fit mx-auto mb-4'>
           <Brand />
         </div>
