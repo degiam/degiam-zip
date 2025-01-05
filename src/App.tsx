@@ -1,7 +1,65 @@
-import { useEffect, useState } from 'react';
-import Dropzone from './components/dropzone';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import Dropzone from './components/zip';
 
 function App() {
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const updateTheme = useCallback((isDarkMode: boolean) => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleThemeChange = (event: MessageEvent) => {
+      if (event.data?.type === 'theme-change') {
+        updateTheme(event.data.isDarkMode);
+      }
+    };
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = (event: MediaQueryListEvent) => {
+      updateTheme(event.matches);
+    };
+
+    updateTheme(mediaQuery.matches);
+
+    window.addEventListener('message', handleThemeChange);
+    mediaQuery.addEventListener('change', handleMediaChange);
+
+    return () => {
+      window.removeEventListener('message', handleThemeChange);
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
+  }, [updateTheme]);
+
+  useEffect(() => {
+    const handleScreenSizeMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'screen-size') {
+        setIsStandalone(true);
+        setIsMobile(event.data.isMobile);
+      }
+    };
+
+    window.addEventListener('message', handleScreenSizeMessage);
+
+    return () => {
+      window.removeEventListener('message', handleScreenSizeMessage);
+    };
+  }, []);
+
+  const mainClass = useMemo(() => {
+    if (isStandalone) {
+      return isMobile
+        ? '[&_.main-layout]:max-md:pb-24'
+        : '[&_.main-layout]:md:pt-24';
+    }
+    return '';
+  }, [isStandalone, isMobile]);
+
   // useEffect(() => {
   //   const sendHeightToParent = () => {
   //     const height = document.body.scrollHeight;
@@ -18,63 +76,8 @@ function App() {
   //   };
   // }, []);
 
-  useEffect(() => {
-    window.addEventListener('message', (event) => {
-      if (event.data?.type === 'theme-change') {
-        if (event.data.isDarkMode) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      }
-    });
-
-    const updateTheme = (isDarkMode: boolean) => {
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    };
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    updateTheme(mediaQuery.matches);
-
-    const handleChange = (event: MediaQueryListEvent) => {
-      updateTheme(event.matches);
-    };
-    mediaQuery.addEventListener('change', handleChange);
-
-    return () => {
-      window.removeEventListener('message', () => {});
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, []);
-
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'screen-size') {
-        setIsStandalone(true);
-        if (event.data.isMobile) {
-          setIsMobile(true);
-        } else {
-          setIsMobile(false);
-        }
-      }
-    };
-  
-    window.addEventListener('message', handleMessage);
-  
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, []);
-
   return (
-    <main className={isStandalone ? isMobile ? '[&_.main-layout]:max-md:pb-24' : '[&_.main-layout]:md:pt-24' : ''}>
+    <main className={mainClass}>
       <h1 className='sr-only'>KieZip by Degiam</h1>
       <Dropzone />
     </main>
