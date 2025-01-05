@@ -30,6 +30,8 @@ function App() {
     window.addEventListener('message', handleThemeChange);
     mediaQuery.addEventListener('change', handleMediaChange);
 
+    window.parent.postMessage({ type: 'iframe-ready' }, '*');
+
     return () => {
       window.removeEventListener('message', handleThemeChange);
       mediaQuery.removeEventListener('change', handleMediaChange);
