@@ -189,9 +189,9 @@ const Dropzone = () => {
             </ul>
             <button
               onClick={openPopup}
-              className='mt-8 w-full px-4 py-3 rounded-lg transition font-bold text-white bg-cyan-500 hover:bg-cyan-600'
+              className='mt-8 w-full px-4 py-3 rounded-lg transition font-bold text-whitebg-cyan-500 hover:bg-cyan-600 dark:bg-cyan-600 dark:hover:bg-cyan-500'
             >
-              Download ZIP
+              Buat ZIP
             </button>
           </div>
         )}
@@ -215,7 +215,7 @@ const Dropzone = () => {
               <button
                 type='button'
                 onClick={handleDownloadZip}
-                className='w-full px-4 py-3 rounded-lg transition font-bold text-white bg-cyan-500 hover:bg-cyan-600'
+                className='w-full px-4 py-3 rounded-lg transition font-bold text-white bg-cyan-500 hover:bg-cyan-600 dark:bg-cyan-600 dark:hover:bg-cyan-500'
               >
                 Unduh ZIP
               </button>

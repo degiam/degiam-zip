@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react';
 import Dropzone from './components/dropzone';
 
 function App() {
-  useEffect(() => {
-    const sendHeightToParent = () => {
-      const height = document.body.scrollHeight;
-      window.parent.postMessage({ type: 'resize', height }, '*');
-    };
+  // useEffect(() => {
+  //   const sendHeightToParent = () => {
+  //     const height = document.body.scrollHeight;
+  //     window.parent.postMessage({ type: 'resize', height }, '*');
+  //   };
 
-    sendHeightToParent();
+  //   sendHeightToParent();
 
-    const observer = new MutationObserver(sendHeightToParent);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+  //   const observer = new MutationObserver(sendHeightToParent);
+  //   observer.observe(document.body, { childList: true, subtree: true, attributes: true });
 
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     observer.disconnect();
+  //   };
+  // }, []);
 
   useEffect(() => {
     window.addEventListener('message', (event) => {
@@ -75,7 +75,7 @@ function App() {
 
   return (
     <main className={isStandalone ? isMobile ? '[&_.main-layout]:max-md:pb-24' : '[&_.main-layout]:md:pt-24' : ''}>
-      <h1 className='sr-only'>QuiZip by Degiam</h1>
+      <h1 className='sr-only'>KieZip by Degiam</h1>
       <Dropzone />
     </main>
   )
