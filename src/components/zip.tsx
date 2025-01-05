@@ -145,7 +145,7 @@ const Dropzone = () => {
         </div>
       </section>
 
-      <section className={`w-full max-w-lg ${uploadedFiles.length < 1 ? 'mb-32' : ''}`}>
+      <section className={`w-full max-w-lg ${uploadedFiles.length < 1 ? 'mb-24 md:mb-32' : ''}`}>
         <div className='w-fit mx-auto mb-4'>
           <Brand />
         </div>
