@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import Dropzone from './components/zip';
+import Archive from './components/archive';
+import Unarchive from './components/unarchive';
 
 function App() {
   const [isStandalone, setIsStandalone] = useState(false);
@@ -78,10 +79,17 @@ function App() {
   //   };
   // }, []);
 
+  const [showArchive, setShowArchive] = useState(true);
+
   return (
     <main className={mainClass}>
       <h1 className='sr-only'>KieZip by Degiam</h1>
-      <Dropzone />
+      {showArchive &&
+        <Archive toggle={setShowArchive} />
+      }
+      {!showArchive &&
+        <Unarchive toggle={setShowArchive} />
+      }
     </main>
   )
 }

@@ -2,10 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import formatFileSize from '../utils/formatFileSize';
 import Brand from './brand';
 import Built from './built';
 
-const Dropzone = () => {
+type ArchiveProps = {
+  toggle: (visible: boolean) => void;
+}
+
+const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
+  const handleToggle = () => {
+    toggle(false);
+  };
+
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<{ file: File; path: string }[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -14,23 +23,6 @@ const Dropzone = () => {
   const [errorName, setErrorName] = useState<string | null>(null);
 
   const filenameRef = useRef<HTMLInputElement>(null);
-
-  const formatFileSize = (size: number) => {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    let unitIndex = 0;
-    let formattedSize = size;
-
-    while (formattedSize >= 1024 && unitIndex < units.length - 1) {
-      formattedSize /= 1024;
-      unitIndex++;
-    }
-
-    if (formattedSize % 1 === 0) {
-      return `${formattedSize} ${units[unitIndex]}`;
-    }
-
-    return `${formattedSize.toFixed(2)} ${units[unitIndex]}`;
-  };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -151,6 +143,22 @@ const Dropzone = () => {
           <Brand />
         </div>
 
+        <div className='flex justify-center gap-2 mb-8'>
+          <button
+            type='button'
+            className='w-20 px-3.5 py-2.5 rounded-lg transition text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
+          >
+            Buat
+          </button>
+          <button
+            type='button'
+            onClick={handleToggle}
+            className='w-20 px-3.5 py-2.5 rounded-lg transition text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
+          >
+            Ekstrak
+          </button>
+        </div>
+
         <div
           className='w-full p-6 transition rounded-2xl border-2 border-dashed hover:border-cyan-400 dark:border-slate-700 dark:hover:border-cyan-500 hover:cursor-pointer'
           {...getRootProps()}
@@ -171,6 +179,7 @@ const Dropzone = () => {
                   <div className='flex items-center'>
                     <span className='text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap'>{formatFileSize(file.size)}</span>
                     <button
+                      type='button'
                       onClick={() => handleRemoveFile(file)}
                       className='ml-3 text-sm text-red-500 hover:text-red-700'
                     >
@@ -189,6 +198,7 @@ const Dropzone = () => {
               ))}
             </ul>
             <button
+              type='button'
               onClick={openPopup}
               className='mt-8 w-full px-4 py-3 rounded-lg transition font-bold text-white border border-cyan-500 hover:border-cyan-600 bg-cyan-500 hover:bg-cyan-600 dark:bg-cyan-600 dark:hover:bg-cyan-500'
             >
@@ -202,8 +212,10 @@ const Dropzone = () => {
             <div className='flex flex-col gap-4 bg-white dark:bg-slate-900 p-8 rounded-xl shadow-xl w-full max-w-md'>
               <h3 className='text-lg font-bold'>Masukkan Nama File ZIP</h3>
               <fieldset className='flex flex-col gap-2 mb-2'>
+                <label className='sr-only' htmlFor='zip_name'>Nama</label>
                 <input
                   ref={filenameRef}
+                  id='zip_name'
                   type='text'
                   value={zipName}
                   onChange={(e) => setZipName(e.target.value)}
@@ -243,4 +255,4 @@ const Dropzone = () => {
   );
 };
 
-export default Dropzone;
+export default Archive;
