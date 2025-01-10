@@ -134,7 +134,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
           flex items-center justify-center w-full h-full
           ${isDragActive ? 'rounded-3xl border-4 border-dashed border-cyan-500' : ''}
         `}>
-          <h2 className='text-4xl font-bold text-cyan-500'>Drop files here</h2>
+          <h2 className='text-4xl font-bold text-cyan-500'>Letakkan File Disini</h2>
         </div>
       </section>
 
