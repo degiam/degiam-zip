@@ -126,7 +126,7 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
           <div className='w-full mt-8'>
             <ul>
               {extractedFiles.map((file, index) => (
-                <li key={index} className='flex justify-between items-center gap-6 py-3 border-b border-slate-200 dark:border-slate-700 last:border-0'>
+                <li key={index} className='flex justify-between items-center gap-6 py-3 break-word border-b border-slate-200 dark:border-slate-700 last:border-0'>
                   <span className='text-sm text-slate-700 dark:text-white'>{file.name}</span>
                   <div className='flex items-center'>
                     <span className='text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap'>{formatFileSize(file.content.size)}</span>

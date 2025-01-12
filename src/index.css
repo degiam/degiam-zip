@@ -12,3 +12,9 @@
     @apply bg-white text-black;
   }
 }
+
+@layer utilities {
+  .break-word {
+    word-break: break-word;
+  }
+}
