@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import formatFileSize from '../utils/formatFileSize';
+import formatMessage from '../utils/formatMessage';
 import Brand from './brand';
 import Built from './built';
 
@@ -18,8 +19,10 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [extractedFiles, setExtractedFiles] = useState<{ name: string; content: Blob }[]>([]);
   const [errorFile, setErrorFile] = useState<string | null>(null);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const handleDrop = async (acceptedFiles: File[]) => {
+    setIsFadingOut(false);
     setIsDragActive(false);
     setErrorFile(null);
     setExtractedFiles([]);
@@ -52,7 +55,7 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
       // console.log('File berhasil diekstrak:', files);
     } catch (error) {
       console.error('Error extracting archive:', error);
-      setErrorFile('Gagal mengekstrak file. Pastikan file yang diunggah adalah arsip yang valid.');
+      setErrorFile('*Gagal ekstrak file*. Pastikan file yang diunggah adalah zip yang valid.');
     }
   };
 
@@ -96,13 +99,13 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
           <button
             type='button'
             onClick={handleToggle}
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
+            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
           >
             Buat
           </button>
           <button
             type='button'
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
+            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
           >
             Ekstrak
           </button>
@@ -148,8 +151,8 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
         )}
 
         {errorFile && (
-          <div className='mt-4 p-4 bg-red-100 text-red-700 rounded-lg'>
-            <p>{errorFile}</p>
+          <div className={`mt-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm transition duration-500 ${isFadingOut ? 'opacity-0 -translate-y-4' : 'opacity-100 -translate-y-0'}`}>
+            <p dangerouslySetInnerHTML={{ __html: formatMessage(errorFile) }}></p>
           </div>
         )}
 

@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import formatFileSize from '../utils/formatFileSize';
+import formatMessage from '../utils/formatMessage';
 import Brand from './brand';
 import Built from './built';
 
@@ -21,24 +22,36 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
   const [zipName, setZipName] = useState('');
   const [errorFile, setErrorFile] = useState<string | null>(null);
   const [errorName, setErrorName] = useState<string | null>(null);
+  const [errorUpload, setErrorUpload] = useState<string | null>(null);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const filenameRef = useRef<HTMLInputElement>(null);
 
+  const handleDrop = async (acceptedFiles: File[]) => {
+    setIsFadingOut(false);
+    const existingPaths = new Set(uploadedFiles.map(({ path }) => path));
+
+    const filesWithPaths = acceptedFiles.map((file) => ({
+      file,
+      path: file.webkitRelativePath || file.name,
+    }));
+
+    const newFiles = filesWithPaths.filter(({ path }) => !existingPaths.has(path));
+
+    if (newFiles.length === 0) {
+      setErrorUpload('File yang diunggah sudah ada, tidak ada yang ditambahkan.');
+      setIsDragActive(false);
+      return;
+    }
+
+    setUploadedFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setIsDragActive(false);
+  };
+
   const { getRootProps, getInputProps } = useDropzone({
-    onDrop: (acceptedFiles) => {
-      const filesWithPaths = acceptedFiles.map((file) => ({
-        file,
-        path: file.webkitRelativePath || file.name,
-      }));
-      setUploadedFiles((prevFiles) => [...prevFiles, ...filesWithPaths]);
-      setIsDragActive(false);
-    },
-    onDragEnter: () => {
-      setIsDragActive(true);
-    },
-    onDragLeave: () => {
-      setIsDragActive(false);
-    },
+    onDrop: handleDrop,
+    onDragEnter: () => setIsDragActive(true),
+    onDragLeave: () => setIsDragActive(false),
   });
 
   const handleRemoveFile = (targetFile: File) => {
@@ -118,6 +131,21 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
     }
   }, [isPopupVisible]);
 
+  useEffect(() => {
+    if (errorUpload) {
+      const fadeOutTimeout = setTimeout(() => setIsFadingOut(true), 9500);
+      const clearErrorTimeout = setTimeout(() => {
+        setErrorUpload(null);
+        setIsFadingOut(false);
+      }, 10000);
+  
+      return () => {
+        clearTimeout(fadeOutTimeout);
+        clearTimeout(clearErrorTimeout);
+      };
+    }
+  }, [errorUpload]);
+
   return (
     <div
       className='flex justify-center items-center min-h-screen p-6 main-layout'
@@ -146,14 +174,14 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
         <div className='flex justify-center gap-2 mb-8'>
           <button
             type='button'
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
+            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
           >
             Buat
           </button>
           <button
             type='button'
             onClick={handleToggle}
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
+            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
           >
             Ekstrak
           </button>
@@ -169,6 +197,12 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
             <p className='text-sm text-slate-400 dark:text-slate-600 mt-2'>atau klik untuk telusuri</p>
           </div>
         </div>
+
+        {errorUpload && (
+          <div className={`mt-8 -mb-3 p-4 bg-red-100 text-red-700 rounded-lg text-sm transition duration-500 ${isFadingOut ? 'opacity-0 -translate-y-4' : 'opacity-100 -translate-y-0'}`}>
+            <p dangerouslySetInnerHTML={{ __html: formatMessage(errorUpload) }}></p>
+          </div>
+        )}
 
         {uploadedFiles.length > 0 && (
           <div className='w-full mt-8'>
@@ -244,8 +278,8 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
         )}
 
         {errorFile && (
-          <div className='mt-4 p-4 bg-red-100 text-red-700 rounded-lg'>
-            <p>{errorFile}</p>
+          <div className='mt-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm'>
+            <p dangerouslySetInnerHTML={{ __html: formatMessage(errorFile) }}></p>
           </div>
         )}
 
