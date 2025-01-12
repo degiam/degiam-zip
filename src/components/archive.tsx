@@ -6,6 +6,7 @@ import formatFileSize from '../utils/formatFileSize';
 import formatMessage from '../utils/formatMessage';
 import Brand from './brand';
 import Built from './built';
+import Popover from './popover';
 
 type ArchiveProps = {
   toggle: (visible: boolean) => void;
@@ -168,7 +169,9 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
 
       <section className={`w-full max-w-lg ${uploadedFiles.length < 1 ? 'mb-24 md:mb-32' : ''}`}>
         <div className='w-fit mx-auto mb-4'>
-          <Brand />
+          <Popover content='Buat dan ekstrak file ZIP tanpa ribet instal aplikasi tambahan'>
+            <Brand />
+          </Popover>
         </div>
 
         <div className='flex justify-center gap-2 mb-8'>
