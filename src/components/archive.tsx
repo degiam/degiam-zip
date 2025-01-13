@@ -72,15 +72,15 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
     if (folderPaths.size === 1) {
       return Array.from(folderPaths)[0];
     } else if (folderPaths.size > 1) {
-      return 'multiple-folders';
+      return 'kiezip';
     }
 
     const hasFilesWithoutFolders = uploadedFiles.some(({ path }) => !path.includes('/'));
     if (hasFilesWithoutFolders) {
-      return 'mixed-files';
+      return 'kiezip';
     }
 
-    return 'files';
+    return 'kiezip';
   };
 
   const handleDownloadZip = async () => {
@@ -107,7 +107,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
       });
 
       const blob = await zip.generateAsync({ type: 'blob' });
-      saveAs(blob, `${zipName || 'archive'}.zip`);
+      saveAs(blob, `${zipName || 'kiezip'}.zip`);
     } catch (error) {
       setErrorFile('Terjadi kesalahan saat membuat ZIP. Silakan periksa lagi file atau folder yang dipilih.');
       console.error(error);
