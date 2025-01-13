@@ -6,6 +6,7 @@ import formatFileSize from '../utils/formatFileSize';
 import formatMessage from '../utils/formatMessage';
 import Brand from './brand';
 import Built from './built';
+import Popover from './popover';
 
 type UnarchiveProps = {
   toggle: (visible: boolean) => void;
@@ -92,7 +93,9 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
 
       <section className={`w-full max-w-lg ${extractedFiles.length < 1 ? 'mb-24 md:mb-32' : ''}`}>
         <div className='w-fit mx-auto mb-4'>
-          <Brand />
+          <Popover content='Buat dan ekstrak file ZIP tanpa ribet instal aplikasi tambahan'>
+            <Brand />
+          </Popover>
         </div>
 
         <div className='flex justify-center gap-2 mb-8'>
@@ -122,7 +125,7 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
           </div>
         </div>
 
-        {extractedFiles.length > 0 && (
+        {extractedFiles.length > 0 &&
           <div className='w-full mt-8'>
             <ul>
               {extractedFiles.map((file, index) => (
@@ -148,13 +151,13 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
               ))}
             </ul>
           </div>
-        )}
+        }
 
-        {errorFile && (
+        {errorFile &&
           <div className={`mt-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm transition duration-500 ${isFadingOut ? 'opacity-0 -translate-y-4' : 'opacity-100 -translate-y-0'}`}>
             <p dangerouslySetInnerHTML={{ __html: formatMessage(errorFile) }}></p>
           </div>
-        )}
+        }
 
         <Built />
       </section>

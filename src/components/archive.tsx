@@ -25,6 +25,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
   const [errorName, setErrorName] = useState<string | null>(null);
   const [errorUpload, setErrorUpload] = useState<string | null>(null);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const filenameRef = useRef<HTMLInputElement>(null);
 
@@ -85,6 +86,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
   const handleDownloadZip = async () => {
     setErrorFile(null);
     setErrorName(null);
+    setIsLoading(true);
 
     const invalidChars = /[<>:"/\\|?*]/;
     if (invalidChars.test(zipName)) {
@@ -109,9 +111,10 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
     } catch (error) {
       setErrorFile('Terjadi kesalahan saat membuat ZIP. Silakan periksa lagi file atau folder yang dipilih.');
       console.error(error);
+    } finally {
+      setIsLoading(false);
+      setIsPopupVisible(false);
     }
-
-    setIsPopupVisible(false);
   };
 
   const openPopup = () => {
@@ -201,13 +204,13 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
           </div>
         </div>
 
-        {errorUpload && (
+        {errorUpload &&
           <div className={`mt-8 -mb-3 p-4 bg-red-100 text-red-700 rounded-lg text-sm transition duration-500 ${isFadingOut ? 'opacity-0 -translate-y-4' : 'opacity-100 -translate-y-0'}`}>
             <p dangerouslySetInnerHTML={{ __html: formatMessage(errorUpload) }}></p>
           </div>
-        )}
+        }
 
-        {uploadedFiles.length > 0 && (
+        {uploadedFiles.length > 0 &&
           <div className='w-full mt-8'>
             <ul>
               {uploadedFiles.map(({ file, path }, index) => (
@@ -242,9 +245,9 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
               Buat ZIP
             </button>
           </div>
-        )}
+        }
 
-        {isPopupVisible && (
+        {isPopupVisible &&
           <div className='fixed inset-0 flex justify-center items-center bg-black/80 z-50'>
             <div className='flex flex-col gap-4 bg-white dark:bg-slate-900 p-8 rounded-xl shadow-xl w-full max-w-md'>
               <h3 className='text-lg font-bold'>Masukkan Nama File ZIP</h3>
@@ -256,7 +259,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
                   type='text'
                   value={zipName}
                   onChange={(e) => setZipName(e.target.value)}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:shadow-[2px_2px_0_#22d3ee,-2px_2px_0_#22d3ee,2px_-2px_0_#22d3ee,-2px_-2px_0_#22d3ee] focus-visible:outline-none focus:border-slate-400 ${errorName ? 'border-red-500' : ''}`}
+                  className={`input ${errorName ? 'border-red-500' : ''}`}
                 />
                 {errorName && 
                   <p className='text-xs text-red-500'>{errorName}</p>
@@ -265,26 +268,35 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
               <button
                 type='button'
                 onClick={handleDownloadZip}
-                className='w-full px-4 py-3 rounded-lg transition font-bold text-white border border-cyan-500 hover:border-cyan-600 bg-cyan-500 hover:bg-cyan-600 dark:bg-cyan-600 dark:hover:bg-cyan-500'
+                className={`w-full px-4 py-3 rounded-lg transition font-bold relative flex items-center justify-center gap-2 text-white border border-cyan-500 hover:border-cyan-600 bg-cyan-500 hover:bg-cyan-600 dark:bg-cyan-600 dark:hover:bg-cyan-500 ${isLoading ? 'pointer-events-none' : ''}`}
               >
-                Unduh ZIP
+                <span>Unduh ZIP</span>
+                {/* {isLoading &&
+                  <div className='w-8 h-8 invert brightness-0 contrast-100 -my-4'>
+                    <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' className='w-full h-full animate-spin text-cyan-600'>
+                      <path fill='none' d='M0 0h24v24H0z' stroke='none' />
+                      <path opacity='.25' d='M5.636 5.636a9 9 0 1 0 12.728 12.728a9 9 0 0 0 -12.728 -12.728z' />
+                      <path d='M16.243 7.757a6 6 0 0 0 -8.486 0' />
+                    </svg>
+                  </div>
+                } */}
               </button>
               <button
                 type='button'
                 onClick={closePopup}
-                className='w-full px-4 py-3 rounded-lg transition text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-200 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800'
+                className={`w-full px-4 py-3 rounded-lg transition text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-200 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 ${isLoading ? 'pointer-events-none' : ''}`}
               >
                 Batal
               </button>
             </div>
           </div>
-        )}
+        }
 
-        {errorFile && (
-          <div className='mt-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm'>
+        {errorFile &&
+          <div className={`mt-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm transition duration-500 ${isFadingOut ? 'opacity-0 -translate-y-4' : 'opacity-100 -translate-y-0'}`}>
             <p dangerouslySetInnerHTML={{ __html: formatMessage(errorFile) }}></p>
           </div>
-        )}
+        }
 
         <Built />
       </section>
