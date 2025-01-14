@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 type PopoverProps = {
   content: string | React.ReactNode;
@@ -6,6 +6,7 @@ type PopoverProps = {
 };
 
 const Popover: React.FC<PopoverProps> = (props) => {
+  const [isInit, setIsInit] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
@@ -37,9 +38,15 @@ const Popover: React.FC<PopoverProps> = (props) => {
     setIsVisible(false);
   };
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsInit(false);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
     <div
-      className="inline-block text-center"
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -47,8 +54,9 @@ const Popover: React.FC<PopoverProps> = (props) => {
       {props.children}
       {isVisible && (
         <div
-          className="absolute bg-black text-white px-4 py-3 text-xs rounded-xl z-10 pointer-events-none transform -translate-x-1/2 -translate-y-1/2 max-w-[170px] break-word after:content-[''] after:absolute after:-top-3.5 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-8 after:border-t-transparent after:border-x-transparent after:border-b-black"
+          className={`absolute bg-black text-white px-4 py-3 text-center text-xs rounded-xl z-10 pointer-events-none transition-opacity transform -translate-x-1/2 -translate-y-1/2 max-w-[170px] break-word after:content-[''] after:absolute after:-top-3.5 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-8 after:border-t-transparent after:border-x-transparent after:border-b-black`}
           style={{
+            opacity: isInit ? 0 : 1,
             top: `${position.y}px`,
             left: `${position.x}px`,
           }}
