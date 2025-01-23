@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -21,6 +21,8 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
   const [extractedFiles, setExtractedFiles] = useState<{ name: string; content: Blob }[]>([]);
   const [errorFile, setErrorFile] = useState<string | null>(null);
   const [isFadingOut, setIsFadingOut] = useState(false);
+
+  const menuRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const handleDrop = async (acceptedFiles: File[]) => {
     setIsFadingOut(false);
@@ -71,6 +73,14 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
     saveAs(file.content, file.name);
   };
 
+  useEffect(() => {
+    const activeElement = menuRefs.current.find(el => el?.classList.contains('active'));
+
+    if (activeElement) {
+      activeElement.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+  },[]);
+
   return (
     <div
       className='flex justify-center items-center min-h-screen p-6 main-layout'
@@ -98,20 +108,24 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
           </Popover>
         </div>
 
-        <div className='flex justify-center gap-2 mb-8'>
-          <button
-            type='button'
-            onClick={handleToggle}
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
-          >
-            Buat
-          </button>
-          <button
-            type='button'
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
-          >
-            Ekstrak
-          </button>
+        <div className='mb-8 -mx-6 px-6 overflow-auto scrollbar-none'>
+          <div className='flex justify-center gap-2 w-max mx-auto'>
+            <button
+              type='button'
+              ref={el => menuRefs.current[0] = el}
+              onClick={handleToggle}
+              className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
+            >
+              Buat
+            </button>
+            <button
+              type='button'
+              ref={el => menuRefs.current[1] = el}
+              className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
+            >
+              Ekstrak
+            </button>
+          </div>
         </div>
 
         <div
@@ -120,7 +134,7 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
         >
           <input {...getInputProps()} />
           <div className='text-center py-4'>
-            <h2 className='text-xl font-semibold text-slate-800 dark:text-white'>Tarik dan Taruh File Disini</h2>
+            <h2 className='text-xl font-semibold text-slate-800 dark:text-white'>Tarik & Taruh File Disini</h2>
             <p className='text-sm text-slate-400 dark:text-slate-600 mt-2'>atau klik untuk telusuri</p>
           </div>
         </div>

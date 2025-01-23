@@ -27,6 +27,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const menuRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const filenameRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = async (acceptedFiles: File[]) => {
@@ -150,6 +151,14 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
     }
   }, [errorUpload]);
 
+  useEffect(() => {
+    const activeElement = menuRefs.current.find(el => el?.classList.contains('active'));
+
+    if (activeElement) {
+      activeElement.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+  },[]);
+
   return (
     <div
       className='flex justify-center items-center min-h-screen p-6 main-layout'
@@ -177,20 +186,24 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
           </Popover>
         </div>
 
-        <div className='flex justify-center gap-2 mb-8'>
-          <button
-            type='button'
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
-          >
-            Buat
-          </button>
-          <button
-            type='button'
-            onClick={handleToggle}
-            className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
-          >
-            Ekstrak
-          </button>
+        <div className='mb-8 -mx-6 px-6 overflow-auto scrollbar-none'>
+          <div className='flex justify-center gap-2 w-max mx-auto'>
+            <button
+              type='button'
+              ref={el => menuRefs.current[0] = el}
+              className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600 active'
+            >
+              Buat
+            </button>
+            <button
+              type='button'
+              ref={el => menuRefs.current[1] = el}
+              onClick={handleToggle}
+              className='min-w-24 px-3.5 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&.active]:pointer-events-none [&.active]:text-white [&.active]:dark:hover:text-white [&.active]:border-cyan-500 [&.active]:bg-cyan-500 [&.active]:dark:bg-cyan-600'
+            >
+              Ekstrak
+            </button>
+          </div>
         </div>
 
         <div
@@ -199,7 +212,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
         >
           <input {...getInputProps()} />
           <div className='text-center py-4'>
-            <h2 className='text-xl font-semibold text-slate-800 dark:text-white'>Tarik dan Taruh File Disini</h2>
+            <h2 className='text-xl font-semibold text-slate-800 dark:text-white'>Tarik & Taruh File Disini</h2>
             <p className='text-sm text-slate-400 dark:text-slate-600 mt-2'>atau klik untuk telusuri</p>
           </div>
         </div>
