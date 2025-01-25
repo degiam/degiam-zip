@@ -161,7 +161,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
 
     const body = document.querySelector('body') as HTMLElement;
     const container = document.querySelector('.menu-container') as HTMLDivElement;
-    if (container.clientWidth > body.clientWidth) {
+    if ((container.clientWidth + 6) > body.clientWidth) {
       setMenuScrolled(true);
     }
   },[]);
