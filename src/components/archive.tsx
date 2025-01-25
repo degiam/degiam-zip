@@ -17,6 +17,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
     toggle(false);
   };
 
+  const [menuScrolled, setMenuScrolled] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<{ file: File; path: string }[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -157,6 +158,12 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
     if (activeElement) {
       activeElement.scrollIntoView({ behavior: "smooth", inline: "center" });
     }
+
+    const body = document.querySelector('body') as HTMLElement;
+    const container = document.querySelector('.menu-container') as HTMLDivElement;
+    if (container.clientWidth > body.clientWidth) {
+      setMenuScrolled(true);
+    }
   },[]);
 
   return (
@@ -187,7 +194,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
         </div>
 
         <div className='mb-8 -mx-6 px-6 overflow-auto scrollbar-none'>
-          <div className='flex justify-center gap-2 w-max mx-auto max-md:[&_button:last-child]:mr-6'>
+          <div className={`menu-container max-md:[&.active_button:last-child]:mr-6 ${menuScrolled ? 'active' : ''} flex justify-center gap-2 w-max mx-auto`}>
             <button
               type='button'
               ref={el => {
