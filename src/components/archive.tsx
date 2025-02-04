@@ -272,7 +272,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
         }
 
         {isPopupVisible &&
-          <div className='fixed inset-0 flex justify-center items-center bg-black/80 z-50'>
+          <div className='fixed inset-0 flex justify-center items-center bg-black/80 z-50 p-3'>
             <div className='flex flex-col gap-4 bg-white dark:bg-slate-900 p-8 rounded-xl shadow-xl w-full max-w-md'>
               <h3 className='text-lg font-bold'>Masukkan Nama File ZIP</h3>
               <fieldset className='flex flex-col gap-2 mb-2'>
