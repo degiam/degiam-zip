@@ -3,8 +3,9 @@ import Archive from './components/archive';
 import Unarchive from './components/unarchive';
 
 function App() {
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isStandalone, setIsStandalone] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isIos, setIsIos] = useState<boolean>(false);
 
   const updateTheme = useCallback((isDarkMode: boolean) => {
     if (isDarkMode) {
@@ -54,6 +55,18 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent
+    const isTouchDevice = navigator.maxTouchPoints && navigator.maxTouchPoints > 2
+
+    if (
+      /iPad|iPhone|iPod/.test(userAgent) ||
+      (userAgent.includes('Mac') && isTouchDevice)
+    ) {
+      setIsIos(true)
+    }
+  },[]);
+
   const mainClass = useMemo(() => {
     if (isStandalone) {
       return isMobile
@@ -85,10 +98,10 @@ function App() {
     <main className={mainClass}>
       <h1 className='sr-only'>KieZip by Degiam</h1>
       {showArchive &&
-        <Archive toggle={setShowArchive} />
+        <Archive toggle={setShowArchive} ios={isIos} />
       }
       {!showArchive &&
-        <Unarchive toggle={setShowArchive} />
+        <Unarchive toggle={setShowArchive} ios={isIos} />
       }
     </main>
   )

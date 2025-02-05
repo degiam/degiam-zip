@@ -10,9 +10,10 @@ import Popover from './popover';
 
 type ArchiveProps = {
   toggle: (visible: boolean) => void;
+  ios: boolean;
 }
 
-const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
+const Archive: React.FC<ArchiveProps> = ({ toggle, ios }) => {
   const handleToggle = () => {
     toggle(false);
   };
@@ -194,7 +195,7 @@ const Archive: React.FC<ArchiveProps> = ({ toggle }) => {
         </div>
 
         <div className='mb-8 -mx-6 px-6 overflow-auto scrollbar-none'>
-          <div className={`menu-container max-md:[&.active_button:last-child]:mr-6 ${menuScrolled ? 'active' : ''} flex justify-center gap-2 w-max mx-auto`}>
+          <div className={`menu-container ${ios ? 'max-md:[&.active_button:last-child]:mr-6' : ''} ${menuScrolled ? 'active' : ''} flex justify-center gap-2 w-max mx-auto`}>
             <button
               type='button'
               ref={el => {

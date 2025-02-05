@@ -10,9 +10,10 @@ import Popover from './popover';
 
 type UnarchiveProps = {
   toggle: (visible: boolean) => void;
+  ios: boolean;
 }
 
-const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
+const Unarchive: React.FC<UnarchiveProps> = ({ toggle, ios }) => {
   const handleToggle = () => {
     toggle(true);
   };
@@ -116,7 +117,7 @@ const Unarchive: React.FC<UnarchiveProps> = ({ toggle }) => {
         </div>
 
         <div className='mb-8 -mx-6 px-6 overflow-auto scrollbar-none'>
-          <div className={`menu-container max-md:[&.active_button:last-child]:mr-6 ${menuScrolled ? 'active' : ''} flex justify-center gap-2 w-max mx-auto`}>
+          <div className={`menu-container ${ios ? 'max-md:[&.active_button:last-child]:mr-6' : ''} ${menuScrolled ? 'active' : ''} flex justify-center gap-2 w-max mx-auto`}>
             <button
               type='button'
               ref={el => {
