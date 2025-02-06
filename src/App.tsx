@@ -3,7 +3,7 @@ import Archive from './components/archive';
 import Unarchive from './components/unarchive';
 
 function App() {
-  const [isStandalone, setIsStandalone] = useState<boolean>(false);
+  const [isChildren, setIsChildren] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isIos, setIsIos] = useState<boolean>(false);
 
@@ -43,7 +43,7 @@ function App() {
   useEffect(() => {
     const handleScreenSizeMessage = (event: MessageEvent) => {
       if (event.data?.type === 'screen-size') {
-        setIsStandalone(true);
+        setIsChildren(true);
         setIsMobile(event.data.isMobile);
       }
     };
@@ -68,13 +68,13 @@ function App() {
   },[]);
 
   const mainClass = useMemo(() => {
-    if (isStandalone) {
+    if (isChildren) {
       return isMobile
         ? 'max-md:[&_.main-layout]:pb-24'
         : 'md:[&_.main-layout]:pt-24';
     }
     return '';
-  }, [isStandalone, isMobile]);
+  }, [isChildren, isMobile]);
 
   // useEffect(() => {
   //   const sendHeightToParent = () => {
@@ -96,7 +96,9 @@ function App() {
 
   return (
     <main className={mainClass}>
-      <h1 className='sr-only'>KieZip by Degiam</h1>
+      {!isChildren &&
+        <h1 className='sr-only'>KieZip by Degiam</h1>
+      }
       {showArchive &&
         <Archive toggle={setShowArchive} ios={isIos} />
       }
